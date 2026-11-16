@@ -4,7 +4,7 @@
   align-items: flex-start;
   gap: 12px;
   padding: var(--space);
-  border: 1px solid #f3c9c6;
+  border: 1px solid var(--danger-border);
   border-radius: var(--radius);
   background: var(--danger-soft);
   color: var(--danger);
@@ -19,5 +19,5 @@
 }
 
 .retry:hover {
-  background: rgb(179 38 30 / 8%);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
 }

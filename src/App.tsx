@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { fetchUsers } from './api/users'
 import { useAsync } from './hooks/useAsync'
+import { useTheme } from './hooks/useTheme'
 import { filterUsersByName } from './lib/filterUsersByName'
 import { SearchInput } from './components/SearchInput/SearchInput'
+import { ThemeToggle } from './components/ThemeToggle/ThemeToggle'
 import { UserList } from './components/UserList/UserList'
 import { PostsPanel } from './components/PostsPanel/PostsPanel'
 import { EmptyState } from './components/ui/EmptyState'
@@ -12,6 +14,7 @@ import type { User } from './types'
 import styles from './App.module.css'
 
 export default function App() {
+  const { theme, toggle: toggleTheme } = useTheme()
   const users = useAsync((signal) => fetchUsers(signal), [])
   const [query, setQuery] = useState('')
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
@@ -23,8 +26,11 @@ export default function App() {
   return (
     <div className={styles.app}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Usuarios y publicaciones</h1>
-        <p className={styles.subtitle}>Datos obtenidos de JSONPlaceholder</p>
+        <div>
+          <h1 className={styles.title}>Usuarios y publicaciones</h1>
+          <p className={styles.subtitle}>Datos obtenidos de JSONPlaceholder</p>
+        </div>
+        <ThemeToggle theme={theme} onToggle={toggleTheme} />
       </header>
 
       <main className={styles.layout}>

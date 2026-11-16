@@ -20,7 +20,7 @@
 }
 
 .input::placeholder {
-  color: #9aa1b1;
+  color: var(--text-muted);
 }
 
 .input:focus-visible {

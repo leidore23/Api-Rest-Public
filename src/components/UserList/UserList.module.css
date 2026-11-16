@@ -19,7 +19,7 @@
 }
 
 .item:hover {
-  border-color: #c9d2e6;
+  border-color: var(--border-strong);
 }
 
 .itemSelected {
