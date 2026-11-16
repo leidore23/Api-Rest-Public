@@ -1,0 +1,28 @@
+.field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.label {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+}
+
+.input::placeholder {
+  color: #9aa1b1;
+}
+
+.input:focus-visible {
+  border-color: var(--accent);
+}

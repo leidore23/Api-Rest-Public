@@ -22,3 +22,9 @@
   margin-bottom: 12px;
   font-size: 1.05rem;
 }
+
+.count {
+  margin-bottom: 10px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}

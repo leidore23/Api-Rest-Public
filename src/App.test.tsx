@@ -47,4 +47,33 @@ describe('App', () => {
     await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument())
     expect(fetchSpy).toHaveBeenCalledTimes(2)
   })
+  it('filtra la lista al escribir en el buscador', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => jsonResponse(users)))
+
+    render(<App />)
+    await screen.findByRole('heading', { name: /leanne graham/i })
+
+    await userEvent.type(
+      screen.getByRole('searchbox', { name: /buscar por nombre/i }),
+      'howell',
+    )
+
+    expect(screen.getByRole('heading', { name: /ervin howell/i })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /leanne graham/i })).not.toBeInTheDocument()
+  })
+
+  it('avisa cuando la búsqueda no encuentra ningún usuario', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => jsonResponse(users)))
+
+    render(<App />)
+    await screen.findByRole('heading', { name: /leanne graham/i })
+
+    await userEvent.type(
+      screen.getByRole('searchbox', { name: /buscar por nombre/i }),
+      'nadie',
+    )
+
+    expect(screen.getByText(/ningún usuario coincide/i)).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /leanne graham/i })).not.toBeInTheDocument()
+  })
 })
