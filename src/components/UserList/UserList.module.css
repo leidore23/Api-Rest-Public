@@ -1,0 +1,30 @@
+.list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.name {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.username {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.detail {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
