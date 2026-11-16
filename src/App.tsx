@@ -63,7 +63,12 @@ export default function App() {
         </section>
 
         {selectedUser ? (
-          <PostsPanel user={selectedUser} />
+          /*
+            La `key` fuerza a montar un panel nuevo al cambiar de usuario. Sin
+            ella React reutilizaría el componente y las publicaciones creadas
+            para el usuario anterior seguirían en pantalla, atribuidas a otro.
+          */
+          <PostsPanel key={selectedUser.id} user={selectedUser} />
         ) : (
           <EmptyState message="Elige un usuario para ver sus publicaciones." />
         )}

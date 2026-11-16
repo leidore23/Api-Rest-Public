@@ -48,8 +48,14 @@ interface StubApiOptions {
  * un test que toca usuarios y publicaciones no dependa del orden de llamada.
  */
 export function stubApi({ postsByUser = { 1: apiPosts } }: StubApiOptions = {}) {
-  const spy = vi.fn(async (input: string) => {
+  const spy = vi.fn(async (input: string, init?: RequestInit) => {
     const url = String(input)
+
+    // La API responde a POST con el eco de lo enviado y el id fijo 101.
+    if (init?.method === 'POST') {
+      const sent = JSON.parse(String(init.body)) as Record<string, unknown>
+      return jsonResponse({ ...sent, id: 101 }, 201)
+    }
 
     if (url.includes('/posts?userId=')) {
       const userId = Number(url.split('userId=')[1])

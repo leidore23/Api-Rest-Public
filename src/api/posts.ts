@@ -1,3 +1,4 @@
+import { createId } from '../lib/createId'
 import type { Post } from '../types'
 import { request } from './client'
 
@@ -30,4 +31,24 @@ export async function fetchPostsByUser(userId: number, signal?: AbortSignal): Pr
   const apiPosts = await request<ApiPost[]>(`/posts?userId=${userId}`, { signal })
 
   return apiPosts.map(toPost)
+}
+
+export interface NewPostInput {
+  userId: number
+  title: string
+  body: string
+}
+
+/**
+ * Crea una publicación.
+ *
+ * Se llama de verdad a la API para que el formulario tenga estados de envío y
+ * error reales, pero la respuesta se descarta: JSONPlaceholder no guarda nada
+ * y devuelve siempre `id: 101`. La publicación que vuelve lleva un
+ * identificador generado en cliente.
+ */
+export async function createPost(input: NewPostInput): Promise<Post> {
+  await request<ApiPost>('/posts', { method: 'POST', body: input })
+
+  return { id: createId(), ...input }
 }

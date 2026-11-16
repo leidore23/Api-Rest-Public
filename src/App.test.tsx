@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
-import { jsonResponse, stubApi, users } from './test/fixtures'
+import { apiPosts, jsonResponse, stubApi, users } from './test/fixtures'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -123,5 +123,66 @@ describe('App', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/\(500\)/)
     expect(screen.getByRole('button', { name: /ervin howell/i })).toBeInTheDocument()
+  })
+  it('añade a la lista la publicación creada en el formulario', async () => {
+    stubApi()
+
+    render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /primera publicación/i })
+
+    await userEvent.type(screen.getByLabelText(/título/i), 'Mi publicación nueva')
+    await userEvent.type(screen.getByLabelText(/texto/i), 'El cuerpo de la publicación.')
+    await userEvent.click(screen.getByRole('button', { name: /publicar/i }))
+
+    expect(
+      await screen.findByRole('heading', { name: /mi publicación nueva/i }),
+    ).toBeInTheDocument()
+
+    // Debe aparecer la primera, antes de las que ya existían.
+    const titulos = screen.getAllByRole('heading', { level: 3 }).map((nodo) => nodo.textContent)
+    expect(titulos[0]).toBe('Mi publicación nueva')
+  })
+
+  it('vacía el formulario después de publicar', async () => {
+    stubApi()
+
+    render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /primera publicación/i })
+
+    await userEvent.type(screen.getByLabelText(/título/i), 'Algo')
+    await userEvent.type(screen.getByLabelText(/texto/i), 'Un cuerpo')
+    await userEvent.click(screen.getByRole('button', { name: /publicar/i }))
+
+    await screen.findByRole('heading', { name: /^algo$/i })
+    expect(screen.getByLabelText(/título/i)).toHaveValue('')
+    expect(screen.getByLabelText(/texto/i)).toHaveValue('')
+  })
+
+  it('conserva lo escrito y avisa si falla la creación', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string, init?: RequestInit) => {
+        if (init?.method === 'POST') {
+          return jsonResponse('Error del servidor', 500)
+        }
+        if (String(input).includes('/posts?userId=')) {
+          return jsonResponse(apiPosts)
+        }
+        return jsonResponse(users)
+      }),
+    )
+
+    render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /primera publicación/i })
+
+    await userEvent.type(screen.getByLabelText(/título/i), 'No se va a guardar')
+    await userEvent.type(screen.getByLabelText(/texto/i), 'Cuerpo')
+    await userEvent.click(screen.getByRole('button', { name: /publicar/i }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/\(500\)/)
+    expect(screen.getByLabelText(/título/i)).toHaveValue('No se va a guardar')
   })
 })

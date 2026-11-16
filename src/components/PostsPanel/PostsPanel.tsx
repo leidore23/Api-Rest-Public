@@ -1,6 +1,6 @@
-import { fetchPostsByUser } from '../../api/posts'
-import { useAsync } from '../../hooks/useAsync'
+import { usePosts } from '../../hooks/usePosts'
 import type { User } from '../../types'
+import { PostForm } from '../PostForm/PostForm'
 import { PostList } from '../PostList/PostList'
 import { EmptyState } from '../ui/EmptyState'
 import { ErrorMessage } from '../ui/ErrorMessage'
@@ -22,7 +22,7 @@ interface PostsPanelProps {
  * nadie.
  */
 export function PostsPanel({ user }: PostsPanelProps) {
-  const posts = useAsync((signal) => fetchPostsByUser(user.id, signal), [user.id])
+  const { state, create } = usePosts(user.id)
 
   return (
     <section className={styles.panel} aria-labelledby="posts-title">
@@ -30,15 +30,17 @@ export function PostsPanel({ user }: PostsPanelProps) {
         Publicaciones de {user.name}
       </h2>
 
-      {posts.status === 'loading' ? <Spinner label="Cargando publicaciones…" /> : null}
+      <PostForm onSubmit={create} />
 
-      {posts.status === 'error' ? (
-        <ErrorMessage message={posts.message} onRetry={posts.reload} />
+      {state.status === 'loading' ? <Spinner label="Cargando publicaciones…" /> : null}
+
+      {state.status === 'error' ? (
+        <ErrorMessage message={state.message} onRetry={state.reload} />
       ) : null}
 
-      {posts.status === 'success' ? (
-        posts.data.length > 0 ? (
-          <PostList posts={posts.data} />
+      {state.status === 'success' ? (
+        state.posts.length > 0 ? (
+          <PostList posts={state.posts} />
         ) : (
           <EmptyState message="Este usuario todavía no tiene publicaciones." />
         )
