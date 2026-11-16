@@ -1,5 +1,5 @@
 .app {
-  max-width: 820px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 32px 20px 64px;
 }
@@ -27,4 +27,19 @@
   margin-bottom: 10px;
   color: var(--text-muted);
   font-size: 0.875rem;
+}
+
+/* Una sola columna en móvil; dos a partir de tablet, para no tener que
+   recorrer los diez usuarios cada vez que se quiere llegar a las
+   publicaciones. */
+.layout {
+  display: grid;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  }
 }

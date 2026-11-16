@@ -1,0 +1,8 @@
+.panel {
+  display: grid;
+  gap: 12px;
+}
+
+.title {
+  font-size: 1.05rem;
+}
