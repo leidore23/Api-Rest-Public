@@ -1,42 +1,45 @@
 /**
+ * De dónde salió un recurso.
+ *
+ * No es un detalle cosmético: decide si se puede llamar a la API. Lo creado en
+ * esta sesión no existe en el servidor, así que `PUT` sobre ello devuelve 404
+ * (comprobado contra la API real, tanto en `/posts` como en `/users`).
+ * Marcarlo de forma explícita es preferible a deducirlo del formato del `id`,
+ * que funciona por casualidad y se rompe en silencio.
+ */
+export type Origin = 'server' | 'local'
+
+/**
  * Usuario de /users. La API devuelve bastantes más campos (dirección,
  * coordenadas, teléfono, web); aquí se modelan sólo los que la interfaz
  * muestra, para que el tipo describa lo que la aplicación usa de verdad.
+ *
+ * El `id` es `string` y no `number` como en la API: `POST /users` devuelve
+ * siempre `id: 11`, así que los usuarios creados llevan un identificador
+ * generado en cliente. Unificar el tipo en el borde de la API evita arrastrar
+ * un `string | number` por toda la aplicación.
  */
 export interface User {
-  id: number
+  id: string
   name: string
   username: string
   email: string
   company: {
     name: string
   }
+  origin: Origin
 }
 
 /**
  * Publicación ya normalizada para la interfaz.
  *
- * El `id` es `string` y no `number` como en la API: las publicaciones creadas
- * desde el formulario se identifican con un UUID generado en cliente, porque
- * `POST /posts` devuelve siempre `id: 101` y dos publicaciones nuevas
- * acabarían compartiendo identificador. Unificar el tipo en el borde de la API
- * evita arrastrar un `string | number` por toda la aplicación.
+ * Mismo criterio que con los usuarios: `POST /posts` devuelve siempre
+ * `id: 101`, de modo que dos publicaciones nuevas compartirían identificador.
  */
-export type PostOrigin = 'server' | 'local'
-
 export interface Post {
   id: string
-  userId: number
+  userId: string
   title: string
   body: string
-  /**
-   * De dónde salió la publicación.
-   *
-   * No es un detalle cosmético: decide si se puede llamar a la API. Las
-   * creadas en esta sesión no existen en el servidor, así que `PUT` sobre
-   * ellas devuelve 404 (comprobado contra la API real). Marcarlo de forma
-   * explícita es preferible a deducirlo del formato del `id`, que funciona
-   * por casualidad y se rompe en silencio.
-   */
-  origin: PostOrigin
+  origin: Origin
 }

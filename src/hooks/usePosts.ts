@@ -32,7 +32,7 @@ interface UsePostsResult {
  * única información que no se puede volver a pedir: la API no guarda nada de
  * lo que se le envía.
  */
-export function usePosts(userId: number): UsePostsResult {
+export function usePosts(userId: string): UsePostsResult {
   const remote = useAsync((signal) => fetchPostsByUser(userId, signal), [userId])
 
   // Un único estado para las tres capas, y no tres por separado: así se

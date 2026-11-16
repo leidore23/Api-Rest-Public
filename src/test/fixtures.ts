@@ -3,25 +3,28 @@ import type { User } from '../types'
 
 export const users: User[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Leanne Graham',
     username: 'Bret',
     email: 'Sincere@april.biz',
     company: { name: 'Romaguera-Crona' },
+    origin: 'server',
   },
   {
-    id: 2,
+    id: '2',
     name: 'Ervin Howell',
     username: 'Antonette',
     email: 'Shanna@melissa.tv',
     company: { name: 'Deckow-Crist' },
+    origin: 'server',
   },
   {
-    id: 3,
+    id: '3',
     name: 'Clementine Bauch',
     username: 'Samantha',
     email: 'Nathan@yesenia.net',
     company: { name: 'Romaguera-Jacobson' },
+    origin: 'server',
   },
 ]
 
@@ -51,10 +54,14 @@ export function stubApi({ postsByUser = { 1: apiPosts } }: StubApiOptions = {}) 
   const spy = vi.fn(async (input: string, init?: RequestInit) => {
     const url = String(input)
 
-    // La API responde a POST con el eco de lo enviado y el id fijo 101.
+    // La API responde a POST con el eco de lo enviado y un id fijo.
     if (init?.method === 'POST') {
       const sent = JSON.parse(String(init.body)) as Record<string, unknown>
-      return jsonResponse({ ...sent, id: 101 }, 201)
+      return jsonResponse({ ...sent, id: url.includes('/users') ? 11 : 101 }, 201)
+    }
+
+    if (init?.method === 'PUT' || init?.method === 'DELETE') {
+      return jsonResponse({})
     }
 
     if (url.includes('/posts?userId=')) {

@@ -22,21 +22,21 @@ interface ApiPost {
 function toPost(apiPost: ApiPost): Post {
   return {
     id: String(apiPost.id),
-    userId: apiPost.userId,
+    userId: String(apiPost.userId),
     title: apiPost.title,
     body: apiPost.body,
     origin: 'server',
   }
 }
 
-export async function fetchPostsByUser(userId: number, signal?: AbortSignal): Promise<Post[]> {
+export async function fetchPostsByUser(userId: string, signal?: AbortSignal): Promise<Post[]> {
   const apiPosts = await request<ApiPost[]>(`/posts?userId=${userId}`, { signal })
 
   return apiPosts.map(toPost)
 }
 
 export interface NewPostInput {
-  userId: number
+  userId: string
   title: string
   body: string
 }

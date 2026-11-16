@@ -24,8 +24,8 @@ describe('App', () => {
 
     render(<App />)
 
-    expect(await screen.findByRole('button', { name: /leanne graham/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /ervin howell/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /ver publicaciones de ervin howell/i })).toBeInTheDocument()
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
@@ -43,7 +43,7 @@ describe('App', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /reintentar/i }))
 
-    expect(await screen.findByRole('button', { name: /leanne graham/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i })).toBeInTheDocument()
     await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument())
     expect(fetchSpy).toHaveBeenCalledTimes(2)
   })
@@ -52,31 +52,31 @@ describe('App', () => {
     stubApi()
 
     render(<App />)
-    await screen.findByRole('button', { name: /leanne graham/i })
+    await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i })
 
     await userEvent.type(screen.getByRole('searchbox', { name: /buscar por nombre/i }), 'howell')
 
-    expect(screen.getByRole('button', { name: /ervin howell/i })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /leanne graham/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /ver publicaciones de ervin howell/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /ver publicaciones de leanne graham/i })).not.toBeInTheDocument()
   })
 
   it('avisa cuando la búsqueda no encuentra ningún usuario', async () => {
     stubApi()
 
     render(<App />)
-    await screen.findByRole('button', { name: /leanne graham/i })
+    await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i })
 
     await userEvent.type(screen.getByRole('searchbox', { name: /buscar por nombre/i }), 'nadie')
 
     expect(screen.getByText(/ningún usuario coincide/i)).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /leanne graham/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /ver publicaciones de leanne graham/i })).not.toBeInTheDocument()
   })
 
   it('muestra las publicaciones del usuario elegido', async () => {
     stubApi()
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
 
     expect(
       await screen.findByRole('heading', { name: /publicaciones de leanne graham/i }),
@@ -89,11 +89,11 @@ describe('App', () => {
     stubApi()
 
     render(<App />)
-    const leanne = await screen.findByRole('button', { name: /leanne graham/i })
+    const leanne = await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i })
     await userEvent.click(leanne)
 
     expect(leanne).toHaveAttribute('aria-current', 'true')
-    expect(screen.getByRole('button', { name: /ervin howell/i })).not.toHaveAttribute(
+    expect(screen.getByRole('button', { name: /ver publicaciones de ervin howell/i })).not.toHaveAttribute(
       'aria-current',
     )
   })
@@ -102,7 +102,7 @@ describe('App', () => {
     stubApi({ postsByUser: { 1: [] } })
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
 
     expect(await screen.findByText(/todavía no tiene publicaciones/i)).toBeInTheDocument()
   })
@@ -119,16 +119,16 @@ describe('App', () => {
     )
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/\(500\)/)
-    expect(screen.getByRole('button', { name: /ervin howell/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /ver publicaciones de ervin howell/i })).toBeInTheDocument()
   })
   it('añade a la lista la publicación creada en el formulario', async () => {
     stubApi()
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /primera publicación/i })
 
     await userEvent.type(screen.getByLabelText(/título/i), 'Mi publicación nueva')
@@ -148,7 +148,7 @@ describe('App', () => {
     stubApi()
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /primera publicación/i })
 
     await userEvent.type(screen.getByLabelText(/título/i), 'Algo')
@@ -175,7 +175,7 @@ describe('App', () => {
     )
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /primera publicación/i })
 
     await userEvent.type(screen.getByLabelText(/título/i), 'No se va a guardar')
@@ -189,7 +189,7 @@ describe('App', () => {
     const fetchSpy = stubApi()
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /primera publicación/i })
 
     await userEvent.click(screen.getByRole('button', { name: /editar: primera publicación/i }))
@@ -212,7 +212,7 @@ describe('App', () => {
     const fetchSpy = stubApi()
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /primera publicación/i })
 
     await userEvent.type(screen.getByLabelText(/título/i), 'Recién creada')
@@ -239,7 +239,7 @@ describe('App', () => {
     stubApi()
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /primera publicación/i })
 
     await userEvent.click(screen.getByRole('button', { name: /borrar: primera publicación/i }))
@@ -260,7 +260,7 @@ describe('App', () => {
     stubApi()
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /primera publicación/i })
 
     await userEvent.click(screen.getByRole('button', { name: /borrar: primera publicación/i }))
@@ -273,7 +273,7 @@ describe('App', () => {
     stubApi()
 
     const primera = render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /primera publicación/i })
 
     await userEvent.type(screen.getByLabelText(/título/i), 'Sobrevive a la recarga')
@@ -285,7 +285,7 @@ describe('App', () => {
     primera.unmount()
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
 
     expect(
       await screen.findByRole('heading', { name: /sobrevive a la recarga/i }),
@@ -296,7 +296,7 @@ describe('App', () => {
     stubApi({ postsByUser: { 1: apiPosts, 2: [] } })
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /primera publicación/i })
 
     await userEvent.type(screen.getByLabelText(/título/i), 'Solo de Leanne')
@@ -304,7 +304,7 @@ describe('App', () => {
     await userEvent.click(screen.getByRole('button', { name: /publicar/i }))
     await screen.findByRole('heading', { name: /solo de leanne/i })
 
-    await userEvent.click(screen.getByRole('button', { name: /ervin howell/i }))
+    await userEvent.click(screen.getByRole('button', { name: /ver publicaciones de ervin howell/i }))
 
     expect(await screen.findByText(/todavía no tiene publicaciones/i)).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /solo de leanne/i })).not.toBeInTheDocument()
@@ -314,7 +314,7 @@ describe('App', () => {
     stubApi()
 
     const primera = render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /primera publicación/i })
 
     await userEvent.click(screen.getByRole('button', { name: /borrar: primera publicación/i }))
@@ -326,9 +326,142 @@ describe('App', () => {
     primera.unmount()
 
     render(<App />)
-    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await userEvent.click(await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }))
     await screen.findByRole('heading', { name: /segunda publicación/i })
 
     expect(screen.queryByRole('heading', { name: /primera publicación/i })).not.toBeInTheDocument()
+  })
+  it('crea un usuario y lo muestra al principio de la lista', async () => {
+    stubApi()
+
+    render(<App />)
+    await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /añadir usuario/i }))
+    await userEvent.type(screen.getByLabelText(/^nombre$/i), 'Ada Lovelace')
+    await userEvent.type(screen.getByLabelText(/nombre de usuario/i), 'ada')
+    await userEvent.type(screen.getByLabelText(/email/i), 'ada@example.com')
+    await userEvent.click(screen.getByRole('button', { name: /crear usuario/i }))
+
+    expect(
+      await screen.findByRole('button', { name: /ver publicaciones de ada lovelace/i }),
+    ).toBeInTheDocument()
+
+    const nombres = screen
+      .getAllByRole('button', { name: /^ver publicaciones de/i })
+      .map((nodo) => nodo.getAttribute('aria-label'))
+    expect(nombres[0]).toBe('Ver publicaciones de Ada Lovelace')
+  })
+
+  it('edita un usuario existente y pide el PUT a la API', async () => {
+    const fetchSpy = stubApi()
+
+    render(<App />)
+    await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /editar: leanne graham/i }))
+
+    const formulario = within(screen.getByRole('form', { name: /editar usuario/i }))
+    const nombre = formulario.getByLabelText(/^nombre$/i)
+    await userEvent.clear(nombre)
+    await userEvent.type(nombre, 'Leanne Corregida')
+    await userEvent.click(formulario.getByRole('button', { name: /guardar/i }))
+
+    expect(
+      await screen.findByRole('button', { name: /ver publicaciones de leanne corregida/i }),
+    ).toBeInTheDocument()
+
+    const metodos = fetchSpy.mock.calls.map(([, init]) => (init as RequestInit | undefined)?.method)
+    expect(metodos).toContain('PUT')
+  })
+
+  it('no llama a la API al editar un usuario creado en cliente', async () => {
+    const fetchSpy = stubApi()
+
+    render(<App />)
+    await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /añadir usuario/i }))
+    await userEvent.type(screen.getByLabelText(/^nombre$/i), 'Ada Lovelace')
+    await userEvent.type(screen.getByLabelText(/nombre de usuario/i), 'ada')
+    await userEvent.type(screen.getByLabelText(/email/i), 'ada@example.com')
+    await userEvent.click(screen.getByRole('button', { name: /crear usuario/i }))
+    await screen.findByRole('button', { name: /ver publicaciones de ada lovelace/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /editar: ada lovelace/i }))
+    const formulario = within(screen.getByRole('form', { name: /editar usuario/i }))
+    const nombre = formulario.getByLabelText(/^nombre$/i)
+    await userEvent.clear(nombre)
+    await userEvent.type(nombre, 'Ada Editada')
+    await userEvent.click(formulario.getByRole('button', { name: /guardar/i }))
+
+    await screen.findByRole('button', { name: /ver publicaciones de ada editada/i })
+
+    const metodos = fetchSpy.mock.calls.map(([, init]) => (init as RequestInit | undefined)?.method)
+    expect(metodos).not.toContain('PUT')
+  })
+
+  it('pide confirmación antes de borrar un usuario y luego lo quita', async () => {
+    stubApi()
+
+    render(<App />)
+    await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /borrar: leanne graham/i }))
+    expect(
+      screen.getByRole('button', { name: /ver publicaciones de leanne graham/i }),
+    ).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: /sí, borrar/i }))
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('button', { name: /ver publicaciones de leanne graham/i }),
+      ).not.toBeInTheDocument(),
+    )
+    expect(
+      screen.getByRole('button', { name: /ver publicaciones de ervin howell/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('cierra el panel de publicaciones si se borra el usuario seleccionado', async () => {
+    stubApi()
+
+    render(<App />)
+    await userEvent.click(
+      await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i }),
+    )
+    await screen.findByRole('heading', { name: /publicaciones de leanne graham/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /borrar: leanne graham/i }))
+    await userEvent.click(screen.getByRole('button', { name: /sí, borrar/i }))
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('heading', { name: /publicaciones de leanne graham/i }),
+      ).not.toBeInTheDocument(),
+    )
+    expect(screen.getByText(/elige un usuario/i)).toBeInTheDocument()
+  })
+
+  it('conserva los usuarios creados al volver a montar la aplicación', async () => {
+    stubApi()
+
+    const primera = render(<App />)
+    await screen.findByRole('button', { name: /ver publicaciones de leanne graham/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /añadir usuario/i }))
+    await userEvent.type(screen.getByLabelText(/^nombre$/i), 'Ada Lovelace')
+    await userEvent.type(screen.getByLabelText(/nombre de usuario/i), 'ada')
+    await userEvent.type(screen.getByLabelText(/email/i), 'ada@example.com')
+    await userEvent.click(screen.getByRole('button', { name: /crear usuario/i }))
+    await screen.findByRole('button', { name: /ver publicaciones de ada lovelace/i })
+
+    primera.unmount()
+    render(<App />)
+
+    expect(
+      await screen.findByRole('button', { name: /ver publicaciones de ada lovelace/i }),
+    ).toBeInTheDocument()
   })
 })

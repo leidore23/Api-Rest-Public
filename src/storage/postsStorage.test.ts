@@ -3,7 +3,7 @@ import type { Post } from '../types'
 
 const post: Post = {
   id: 'local-1',
-  userId: 1,
+  userId: '1',
   title: 'Guardada',
   body: 'Cuerpo',
   origin: 'local',
