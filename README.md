@@ -28,12 +28,15 @@ La aplicación queda disponible en `http://localhost:5173`.
 | `npm run dev` | Servidor de desarrollo con recarga en caliente |
 | `npm run build` | Comprobación de tipos y build de producción |
 | `npm run preview` | Sirve localmente el build de producción |
+| `npm test` | Ejecuta la suite de tests una vez |
+| `npm run test:watch` | Tests en modo watch |
 | `npm run lint` | Linter (oxlint) |
 
 ## Stack
 
 - **Vite** como herramienta de build y servidor de desarrollo
 - **React 19** con **TypeScript** en modo `strict`
+- **Vitest** + **Testing Library** sobre **jsdom** para los tests
 
 ---
 
