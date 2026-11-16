@@ -38,6 +38,11 @@
   resize: vertical;
 }
 
+.input[aria-invalid='true'],
+.textarea[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
 .actions {
   display: flex;
   align-items: center;
