@@ -68,3 +68,16 @@
   color: var(--danger);
   font-size: 0.875rem;
 }
+
+.cancel {
+  padding: 9px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.cancel:hover {
+  border-color: #c9d2e6;
+  color: var(--text);
+}

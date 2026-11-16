@@ -22,9 +22,21 @@ export interface User {
  * acabarían compartiendo identificador. Unificar el tipo en el borde de la API
  * evita arrastrar un `string | number` por toda la aplicación.
  */
+export type PostOrigin = 'server' | 'local'
+
 export interface Post {
   id: string
   userId: number
   title: string
   body: string
+  /**
+   * De dónde salió la publicación.
+   *
+   * No es un detalle cosmético: decide si se puede llamar a la API. Las
+   * creadas en esta sesión no existen en el servidor, así que `PUT` sobre
+   * ellas devuelve 404 (comprobado contra la API real). Marcarlo de forma
+   * explícita es preferible a deducirlo del formato del `id`, que funciona
+   * por casualidad y se rompe en silencio.
+   */
+  origin: PostOrigin
 }

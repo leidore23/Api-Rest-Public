@@ -1,4 +1,5 @@
 import { createId } from '../lib/createId'
+import type { PostFormValues } from '../lib/validatePost'
 import type { Post } from '../types'
 import { request } from './client'
 
@@ -24,6 +25,7 @@ function toPost(apiPost: ApiPost): Post {
     userId: apiPost.userId,
     title: apiPost.title,
     body: apiPost.body,
+    origin: 'server',
   }
 }
 
@@ -50,5 +52,36 @@ export interface NewPostInput {
 export async function createPost(input: NewPostInput): Promise<Post> {
   await request<ApiPost>('/posts', { method: 'POST', body: input })
 
-  return { id: createId(), ...input }
+  return { id: createId(), origin: 'local', ...input }
+}
+
+/**
+ * Guarda los cambios de una publicación.
+ *
+ * Sólo se llama a la API si la publicación vino de ella. Las creadas en esta
+ * sesión no existen en el servidor y `PUT /posts/<id-local>` responde 404, así
+ * que pedirlo sería provocar un error a propósito para luego ignorarlo.
+ */
+export async function updatePost(post: Post, values: PostFormValues): Promise<Post> {
+  if (post.origin === 'server') {
+    await request<ApiPost>(`/posts/${post.id}`, {
+      method: 'PUT',
+      body: { id: Number(post.id), userId: post.userId, ...values },
+    })
+  }
+
+  return { ...post, ...values }
+}
+
+/**
+ * Borra una publicación.
+ *
+ * A diferencia de `PUT`, la API responde 200 a `DELETE` con cualquier id, pero
+ * se mantiene la misma condición: no tiene sentido pedir al servidor que borre
+ * algo que nunca llegó a recibir.
+ */
+export async function deletePost(post: Post): Promise<void> {
+  if (post.origin === 'server') {
+    await request<unknown>(`/posts/${post.id}`, { method: 'DELETE' })
+  }
 }

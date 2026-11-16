@@ -22,7 +22,7 @@ interface PostsPanelProps {
  * nadie.
  */
 export function PostsPanel({ user }: PostsPanelProps) {
-  const { state, create } = usePosts(user.id)
+  const { state, create, update, remove } = usePosts(user.id)
 
   return (
     <section className={styles.panel} aria-labelledby="posts-title">
@@ -40,7 +40,7 @@ export function PostsPanel({ user }: PostsPanelProps) {
 
       {state.status === 'success' ? (
         state.posts.length > 0 ? (
-          <PostList posts={state.posts} />
+          <PostList posts={state.posts} onUpdate={update} onDelete={remove} />
         ) : (
           <EmptyState message="Este usuario todavía no tiene publicaciones." />
         )

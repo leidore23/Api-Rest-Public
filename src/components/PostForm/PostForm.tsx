@@ -6,17 +6,41 @@ import styles from './PostForm.module.css'
 
 interface PostFormProps {
   onSubmit: (values: PostFormValues) => Promise<void>
+  /** Valores de partida; con ellos el formulario sirve para editar. */
+  initialValues?: PostFormValues
+  legend?: string
+  submitLabel?: string
+  submittingLabel?: string
+  /** Al crear conviene vaciar los campos; al editar, no. */
+  clearOnSuccess?: boolean
+  onCancel?: () => void
 }
 
-export function PostForm({ onSubmit }: PostFormProps) {
+/**
+ * Formulario de publicación, para crear y para editar.
+ *
+ * Es el mismo componente en ambos casos para que las reglas de validación, el
+ * marcado accesible y el manejo de errores no existan por duplicado: corregir
+ * algo en uno y olvidarlo en el otro es cuestión de tiempo.
+ */
+export function PostForm({
+  onSubmit,
+  initialValues,
+  legend = 'Nueva publicación',
+  submitLabel = 'Publicar',
+  submittingLabel = 'Publicando…',
+  clearOnSuccess = true,
+  onCancel,
+}: PostFormProps) {
   const titleId = useId()
   const bodyId = useId()
+  const legendId = useId()
 
   const titleRef = useRef<HTMLInputElement>(null)
   const bodyRef = useRef<HTMLTextAreaElement>(null)
 
-  const [title, setTitle] = useState('')
-  const [body, setBody] = useState('')
+  const [title, setTitle] = useState(initialValues?.title ?? '')
+  const [body, setBody] = useState(initialValues?.body ?? '')
   const [errors, setErrors] = useState<PostFormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -69,24 +93,39 @@ export function PostForm({ onSubmit }: PostFormProps) {
 
     try {
       await onSubmit(values)
-      setTitle('')
-      setBody('')
+
+      if (clearOnSuccess) {
+        setTitle('')
+        setBody('')
+      }
+
       setErrors({})
       setHasSubmitted(false)
     } catch (caught) {
       // El formulario conserva lo escrito: si la petición falla, perder el
       // texto obligaría a reescribirlo todo.
       setSubmitError(
-        caught instanceof Error ? caught.message : 'No se pudo crear la publicación.',
+        caught instanceof Error ? caught.message : 'No se pudo guardar la publicación.',
       )
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  // `aria-labelledby` da nombre al formulario. Hace falta porque al editar hay
+  // dos en pantalla, cada uno con un campo "Título": sin nombre, un lector de
+  // pantalla los anuncia igual y no hay forma de distinguirlos. De paso
+  // convierte el elemento en una región con rol `form`.
   return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <p className={styles.legend}>Nueva publicación</p>
+    <form
+      className={styles.form}
+      onSubmit={handleSubmit}
+      aria-labelledby={legendId}
+      noValidate
+    >
+      <p className={styles.legend} id={legendId}>
+        {legend}
+      </p>
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor={titleId}>
@@ -130,8 +169,18 @@ export function PostForm({ onSubmit }: PostFormProps) {
 
       <div className={styles.actions}>
         <button type="submit" className={styles.submit} disabled={isSubmitting}>
-          {isSubmitting ? 'Publicando…' : 'Publicar'}
+          {isSubmitting ? submittingLabel : submitLabel}
         </button>
+        {onCancel ? (
+          <button
+            type="button"
+            className={styles.cancel}
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            Cancelar
+          </button>
+        ) : null}
         {submitError ? (
           <p className={styles.error} role="alert">
             {submitError}

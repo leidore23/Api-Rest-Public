@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 import { apiPosts, jsonResponse, stubApi, users } from './test/fixtures'
@@ -184,5 +184,151 @@ describe('App', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/\(500\)/)
     expect(screen.getByLabelText(/título/i)).toHaveValue('No se va a guardar')
+  })
+  it('edita una publicación existente y conserva el cambio', async () => {
+    const fetchSpy = stubApi()
+
+    render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /primera publicación/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /editar: primera publicación/i }))
+
+    const formularioEdicion = within(screen.getByRole('form', { name: /editar publicación/i }))
+    const titulo = formularioEdicion.getByLabelText(/título/i)
+    await userEvent.clear(titulo)
+    await userEvent.type(titulo, 'Título corregido')
+    await userEvent.click(formularioEdicion.getByRole('button', { name: /guardar/i }))
+
+    expect(await screen.findByRole('heading', { name: /título corregido/i })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /primera publicación/i })).not.toBeInTheDocument()
+
+    // Debe haberse pedido el PUT, porque la publicación venía del servidor.
+    const metodos = fetchSpy.mock.calls.map(([, init]) => (init as RequestInit | undefined)?.method)
+    expect(metodos).toContain('PUT')
+  })
+
+  it('no llama a la API al editar una publicación creada en cliente', async () => {
+    const fetchSpy = stubApi()
+
+    render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /primera publicación/i })
+
+    await userEvent.type(screen.getByLabelText(/título/i), 'Recién creada')
+    await userEvent.type(screen.getByLabelText(/texto/i), 'Un cuerpo')
+    await userEvent.click(screen.getByRole('button', { name: /publicar/i }))
+    await screen.findByRole('heading', { name: /recién creada/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /editar: recién creada/i }))
+
+    const formularioEdicion = within(screen.getByRole('form', { name: /editar publicación/i }))
+    const titulo = formularioEdicion.getByLabelText(/título/i)
+    await userEvent.clear(titulo)
+    await userEvent.type(titulo, 'Editada en local')
+    await userEvent.click(formularioEdicion.getByRole('button', { name: /guardar/i }))
+
+    expect(await screen.findByRole('heading', { name: /editada en local/i })).toBeInTheDocument()
+
+    // PUT sobre un id local devolvería 404: no debe pedirse.
+    const metodos = fetchSpy.mock.calls.map(([, init]) => (init as RequestInit | undefined)?.method)
+    expect(metodos).not.toContain('PUT')
+  })
+
+  it('pide confirmación antes de borrar y luego la quita de la lista', async () => {
+    stubApi()
+
+    render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /primera publicación/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /borrar: primera publicación/i }))
+
+    // Todavía no se ha borrado nada: primero hay que confirmar.
+    expect(screen.getByRole('heading', { name: /primera publicación/i })).toBeInTheDocument()
+    expect(screen.getByText(/¿borrar esta publicación\?/i)).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: /sí, borrar/i }))
+
+    await waitFor(() =>
+      expect(screen.queryByRole('heading', { name: /primera publicación/i })).not.toBeInTheDocument(),
+    )
+    expect(screen.getByRole('heading', { name: /segunda publicación/i })).toBeInTheDocument()
+  })
+
+  it('permite cancelar el borrado', async () => {
+    stubApi()
+
+    render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /primera publicación/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /borrar: primera publicación/i }))
+    await userEvent.click(screen.getByRole('button', { name: /cancelar/i }))
+
+    expect(screen.getByRole('heading', { name: /primera publicación/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /borrar: primera publicación/i })).toBeInTheDocument()
+  })
+  it('conserva las publicaciones creadas al volver a montar la aplicación', async () => {
+    stubApi()
+
+    const primera = render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /primera publicación/i })
+
+    await userEvent.type(screen.getByLabelText(/título/i), 'Sobrevive a la recarga')
+    await userEvent.type(screen.getByLabelText(/texto/i), 'Guardada en localStorage')
+    await userEvent.click(screen.getByRole('button', { name: /publicar/i }))
+    await screen.findByRole('heading', { name: /sobrevive a la recarga/i })
+
+    // Equivale a recargar la página: se desmonta todo y se vuelve a montar.
+    primera.unmount()
+
+    render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+
+    expect(
+      await screen.findByRole('heading', { name: /sobrevive a la recarga/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('no mezcla las publicaciones creadas entre usuarios distintos', async () => {
+    stubApi({ postsByUser: { 1: apiPosts, 2: [] } })
+
+    render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /primera publicación/i })
+
+    await userEvent.type(screen.getByLabelText(/título/i), 'Solo de Leanne')
+    await userEvent.type(screen.getByLabelText(/texto/i), 'Cuerpo')
+    await userEvent.click(screen.getByRole('button', { name: /publicar/i }))
+    await screen.findByRole('heading', { name: /solo de leanne/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /ervin howell/i }))
+
+    expect(await screen.findByText(/todavía no tiene publicaciones/i)).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /solo de leanne/i })).not.toBeInTheDocument()
+  })
+
+  it('conserva el borrado de una publicación al volver a montar', async () => {
+    stubApi()
+
+    const primera = render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /primera publicación/i })
+
+    await userEvent.click(screen.getByRole('button', { name: /borrar: primera publicación/i }))
+    await userEvent.click(screen.getByRole('button', { name: /sí, borrar/i }))
+    await waitFor(() =>
+      expect(screen.queryByRole('heading', { name: /primera publicación/i })).not.toBeInTheDocument(),
+    )
+
+    primera.unmount()
+
+    render(<App />)
+    await userEvent.click(await screen.findByRole('button', { name: /leanne graham/i }))
+    await screen.findByRole('heading', { name: /segunda publicación/i })
+
+    expect(screen.queryByRole('heading', { name: /primera publicación/i })).not.toBeInTheDocument()
   })
 })

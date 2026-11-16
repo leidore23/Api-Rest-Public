@@ -1,18 +1,24 @@
 import type { Post } from '../../types'
+import type { PostFormValues } from '../../lib/validatePost'
+import { PostItem } from './PostItem'
 import styles from './PostList.module.css'
 
 interface PostListProps {
   posts: Post[]
+  onUpdate: (post: Post, values: PostFormValues) => Promise<void>
+  onDelete: (post: Post) => Promise<void>
 }
 
-export function PostList({ posts }: PostListProps) {
+export function PostList({ posts, onUpdate, onDelete }: PostListProps) {
   return (
     <ul className={styles.list}>
       {posts.map((post) => (
-        <li key={post.id} className={styles.item}>
-          <h3 className={styles.title}>{post.title}</h3>
-          <p className={styles.body}>{post.body}</p>
-        </li>
+        <PostItem
+          key={post.id}
+          post={post}
+          onUpdate={(values) => onUpdate(post, values)}
+          onDelete={() => onDelete(post)}
+        />
       ))}
     </ul>
   )
